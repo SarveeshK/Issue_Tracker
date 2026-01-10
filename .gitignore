@@ -1,0 +1,31 @@
+# Basics
+.DS_Store
+Thumbs.db
+*.user
+
+# .NET
+bin/
+obj/
+*.suo
+*.userprefs
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]uild/
+.vs/
+.vscode/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Frontend Build
+frontend/dist/
+frontend/build/
+frontend/.env
+frontend/.env.local
+
+# Backend
+backend/**/appsettings.Development.json
