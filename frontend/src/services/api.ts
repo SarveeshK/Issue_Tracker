@@ -35,8 +35,12 @@ export const issueService = {
         const response = await api.get<TaskDto>(`/tasks/${taskId}`);
         return response.data;
     },
-    getComments: async (taskId: number) => {
+    getTaskComments: async (taskId: number) => {
         const response = await api.get<CommentDto[]>(`/comments/task/${taskId}`);
+        return response.data;
+    },
+    getIssueComments: async (issueId: number) => {
+        const response = await api.get<CommentDto[]>(`/comments/issue/${issueId}`);
         return response.data;
     },
     createComment: async (data: CreateCommentDto) => {

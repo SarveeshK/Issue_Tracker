@@ -8,9 +8,13 @@ public class Comment
     [Key]
     public int CommentId { get; set; }
     
-    public int TaskId { get; set; }
+    public int? TaskId { get; set; }
     [ForeignKey("TaskId")]
-    public IssueTracker.Domain.Entities.Task Task { get; set; } = null!;
+    public IssueTracker.Domain.Entities.Task? Task { get; set; }
+    
+    public int? IssueId { get; set; }
+    [ForeignKey("IssueId")]
+    public Issue? Issue { get; set; }
     
     public int UserId { get; set; }
     [ForeignKey("UserId")]

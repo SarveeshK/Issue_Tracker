@@ -53,6 +53,15 @@ export const Dashboard: React.FC = () => {
         }
     };
 
+    const getPriorityColor = (priority: string) => {
+        switch (priority) {
+            case 'High': return 'bg-red-50 text-red-600 border-red-100';
+            case 'Medium': return 'bg-orange-50 text-orange-600 border-orange-100';
+            case 'Low': return 'bg-slate-50 text-slate-600 border-slate-100';
+            default: return 'bg-slate-50 text-slate-600 border-slate-100';
+        }
+    };
+
     if (error) return (
         <div className="flex flex-col items-center justify-center p-20">
             <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 text-center max-w-md shadow-sm">
@@ -163,6 +172,7 @@ export const Dashboard: React.FC = () => {
                                 <th className="px-6 py-4 text-left text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">ID</th>
                                 <th className="px-6 py-4 text-left text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Description</th>
                                 <th className="px-6 py-4 text-left text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Status</th>
+                                <th className="px-6 py-4 text-left text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Priority</th>
                                 <th className="px-6 py-4 text-left text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Assigned</th>
                                 <th className="px-6 py-4 text-left text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Reporter</th>
                                 <th className="px-6 py-4 text-left text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Actions</th>
@@ -181,6 +191,11 @@ export const Dashboard: React.FC = () => {
                                     <td className="px-6 py-5 whitespace-nowrap">
                                         <span className={`badge border ${getStatusColor(issue.statusName)}`}>
                                             {issue.statusName}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-5 whitespace-nowrap">
+                                        <span className={`badge border ${getPriorityColor(issue.priorityName)}`}>
+                                            {issue.priorityName}
                                         </span>
                                     </td>
                                     <td className="px-6 py-5 whitespace-nowrap">

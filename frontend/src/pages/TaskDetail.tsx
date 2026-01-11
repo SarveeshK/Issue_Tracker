@@ -1,225 +1,275 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { issueService } from '../services/api';
-import type { TaskDto, CommentDto } from '../types';
-import { CommentThread } from '../components/CommentThread';
+import type { TaskDto } from '../types';
+import { CommentsSection } from '../components/CommentsSection';
+import { ActivityTimeline } from '../components/ActivityTimeline';
 import { useAuth } from '../context/AuthContext';
 
 export const TaskDetail: React.FC = () => {
     const { taskId } = useParams<{ taskId: string }>();
+    const navigate = useNavigate();
+    const { user: currentUser } = useAuth();
+
+    // State
     const [task, setTask] = useState<TaskDto | null>(null);
-    const [comments, setComments] = useState<CommentDto[]>([]);
-    const [users, setUsers] = useState<{ userId: number; name: string }[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [users, setUsers] = useState<{ userId: number; name: string }[]>([]);
     const [assigning, setAssigning] = useState(false);
     const [updatingStatus, setUpdatingStatus] = useState(false);
-    const { user } = useAuth();
+    const [showActivity, setShowActivity] = useState(false);
+    const [logs, setLogs] = useState([]);
 
     useEffect(() => {
-        if (taskId) {
-            loadData(parseInt(taskId));
-        }
+        loadTask();
     }, [taskId]);
 
-    const loadData = async (id: number) => {
+    const loadTask = async () => {
+        if (!taskId) return;
+        setLoading(true);
         try {
-            const [taskData, commentsData] = await Promise.all([
+            const id = parseInt(taskId);
+            const [taskData, logsData] = await Promise.all([
                 issueService.getTaskById(id),
-                issueService.getComments(id)
+                issueService.getTaskLogs(id)
             ]);
             setTask(taskData);
-            setComments(commentsData);
+            setLogs(logsData);
 
-            // Only fetch users if employee (prevent 403)
-            if (user?.roleName !== 'User') {
+            // Fetch users for assignment if not client
+            if (currentUser?.roleName !== 'User') {
                 try {
                     const usersData = await issueService.getUsers();
                     setUsers(usersData);
-                } catch (e) { /* ignore forbidden */ }
+                } catch (e) { console.error('Failed to load users', e); }
             }
         } catch (err) {
+            setError('Failed to load task details');
             console.error(err);
         } finally {
             setLoading(false);
         }
     };
 
-    const refreshComments = () => {
-        if (taskId) {
-            issueService.getComments(parseInt(taskId)).then(setComments);
+    const handleBack = () => {
+        navigate(-1);
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'Open': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+            case 'In Progress': return 'bg-amber-100 text-amber-700 border-amber-200';
+            case 'Resolved': return 'bg-blue-100 text-blue-700 border-blue-200';
+            case 'Closed': return 'bg-slate-100 text-slate-600 border-slate-200';
+            default: return 'bg-indigo-100 text-indigo-700 border-indigo-200';
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-gray-500">Loading Task...</div>;
-    if (!task) return <div className="p-8 text-center text-red-500">Task not found</div>;
+    const getPriorityColor = (priority: string) => {
+        switch (priority) {
+            case 'High': return 'bg-red-100 text-red-800 border-red-200';
+            case 'Medium': return 'bg-orange-100 text-orange-800 border-orange-200';
+            case 'Low': return 'bg-blue-100 text-blue-800 border-blue-200';
+            default: return 'bg-slate-100 text-slate-800 border-slate-200';
+        }
+    };
+
+    if (loading) return (
+        <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+        </div>
+    );
+
+    if (error || !task) return (
+        <div className="container mx-auto p-6 text-center">
+            <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 inline-block">
+                {error || 'Task not found'}
+            </div>
+            <button onClick={handleBack} className="block mx-auto mt-4 text-blue-600 hover:underline">Go Back</button>
+        </div>
+    );
 
     return (
-        <div className="container mx-auto p-4 max-w-4xl">
-            <div className="mb-4">
-                <Link to={`/issues/${task.issueId}`} className="text-blue-600 hover:underline text-sm">
-                    &larr; Back to Issue
-                </Link>
-            </div>
+        <div className="container mx-auto p-6 max-w-5xl">
+            <button onClick={handleBack} className="flex items-center gap-2 text-slate-500 hover:text-blue-600 mb-6 font-bold text-sm transition-colors group">
+                <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back
+            </button>
 
-            <div className="bg-white shadow rounded-lg p-6 mb-6">
-                <div className="flex justify-between items-start mb-4">
-                    <div>
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-2xl font-bold text-gray-900">{task.taskTitle}</h1>
-                            <span className={`px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap ${task.statusName === 'Closed' ? 'bg-gray-100 text-gray-800' :
-                                    task.statusName === 'Resolved' ? 'bg-orange-100 text-orange-800' :
-                                        'bg-green-100 text-green-800'
-                                }`}>
-                                {task.statusName}
-                            </span>
-                            <span className={`px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap ${task.priorityName === 'High' ? 'bg-red-100 text-red-800' :
-                                task.priorityName === 'Medium' ? 'bg-orange-100 text-orange-800' :
-                                    'bg-blue-100 text-blue-800'
-                                }`}>
-                                {task.priorityName} Priority
-                            </span>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Main Content */}
+                <div className="lg:col-span-2 space-y-8">
+                    <div className="premium-card p-8">
+                        <div className="flex justify-between items-start mb-6">
+                            <div>
+                                <h1 className="text-2xl font-extrabold text-slate-900 leading-tight">{task.taskTitle}</h1>
+                                <div className="flex items-center gap-3 mt-3">
+                                    <span className={`badge border ${getStatusColor(task.statusName)}`}>{task.statusName}</span>
+                                    <span className={`badge border ${getPriorityColor(task.priorityName)}`}>{task.priorityName} Priority</span>
+                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">#{task.taskId}</span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
-                            <span>Assigned to:</span>
-                            {user?.roleName === 'Admin' ? (
-                                <select
-                                    className="border rounded px-2 py-1 text-sm text-gray-700 focus:outline-none focus:border-blue-500"
-                                    value={users.find(u => u.name === task.assignedToName)?.userId || ''}
-                                    onChange={async (e) => {
-                                        if (!e.target.value) return;
-                                        setAssigning(true);
-                                        try {
-                                            await issueService.assignTask(task.taskId, parseInt(e.target.value));
-                                            // Update local state
-                                            const u = users.find(u => u.userId === parseInt(e.target.value));
-                                            setTask({ ...task, assignedToName: u?.name ?? null });
-                                        } catch (err) {
-                                            alert('Failed to assign task');
-                                        } finally {
-                                            setAssigning(false);
-                                        }
-                                    }}
-                                    disabled={assigning}
-                                >
-                                    <option value="">Unassigned</option>
-                                    {users.map(u => (
-                                        <option key={u.userId} value={u.userId}>{u.name}</option>
-                                    ))}
-                                </select>
-                            ) : (
-                                <span className="font-semibold text-gray-700">{task.assignedToName || 'Unassigned'}</span>
-                            )}
+
+                        <div className="prose prose-slate max-w-none mb-8">
+                            <h3 className="text-sm font-extrabold text-slate-400 uppercase tracking-widest mb-3">Description</h3>
+                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-slate-700 leading-relaxed text-sm">
+                                {task.taskDescription}
+                            </div>
                         </div>
-                    </div>
-                    {user?.roleName !== 'User' && (
-                        <div>
-                            {(task.statusName === 'Open' || task.statusName === 'In Progress') ? (
-                                <button
-                                    onClick={async () => {
-                                        const action = user?.roleName === 'Admin' ? 'Close' : 'Submit for Review';
-                                        if (!confirm(`${action} this task?`)) return;
-                                        setUpdatingStatus(true);
-                                        console.log(`Task ${task.taskId}: Attempting to set status to ${user?.roleName === 'Admin' ? 'Closed' : 'Resolved'}...`);
-                                        try {
-                                            const targetStatus = user?.roleName === 'Admin' ? 'Closed' : 'Resolved';
-                                            await issueService.updateTaskStatus(task.taskId, targetStatus);
-                                            console.log('Task status updated successfully, re-fetching...');
-                                            await loadData(task.taskId);
-                                            alert(`Task ${targetStatus === 'Closed' ? 'Closed' : 'Submitted for Review'} successfully!`);
-                                        } catch (e: any) {
-                                            const msg = e.response?.data?.message || 'Failed to update status';
-                                            console.error('Update Task Status Error:', e.response?.data || e.message);
-                                            alert(`ERROR: ${msg}`);
-                                        }
-                                        finally { setUpdatingStatus(false); }
-                                    }}
-                                    disabled={updatingStatus}
-                                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors"
-                                >
-                                    {updatingStatus ? 'Updating...' : (user?.roleName === 'Admin' ? 'Close Task' : 'Submit for Review')}
-                                </button>
-                            ) : task.statusName === 'Resolved' ? (
-                                <div className="flex gap-2">
-                                    {user?.roleName === 'Admin' ? (
-                                        <button
-                                            onClick={async () => {
-                                                if (!confirm('Approve and Close this task?')) return;
-                                                setUpdatingStatus(true);
-                                                console.log(`Task ${task.taskId}: Approving and Closing...`);
-                                                try {
-                                                    await issueService.updateTaskStatus(task.taskId, 'Closed');
-                                                    console.log('Task approved and closed successfully, refreshing...');
-                                                    await loadData(task.taskId);
-                                                    alert('Task Approved & Closed successfully!');
-                                                } catch (e: any) {
-                                                    const msg = e.response?.data?.message || 'Failed to close';
-                                                    console.error('Approve & Close Error:', e.response?.data || e.message);
-                                                    alert(`ERROR: ${msg}`);
-                                                }
-                                                finally { setUpdatingStatus(false); }
-                                            }}
-                                            disabled={updatingStatus}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors"
-                                        >
-                                            {updatingStatus ? 'Closing...' : 'Approve & Close'}
-                                        </button>
-                                    ) : (
-                                        <span className="bg-orange-100 text-orange-800 px-3 py-1.5 rounded text-sm font-medium">Pending Review</span>
-                                    )}
+
+                        {/* Action Buttons (Status Updates) */}
+                        {currentUser?.roleName !== 'User' && (
+                            <div className="flex gap-4 border-t border-slate-100 pt-6">
+                                {(task.statusName === 'Open' || task.statusName === 'In Progress') ? (
                                     <button
                                         onClick={async () => {
-                                            if (!confirm('Re-open this task?')) return;
+                                            const action = currentUser?.roleName === 'Admin' ? 'Close' : 'Submit for Review';
+                                            if (!window.confirm(`${action} this task?`)) return;
                                             setUpdatingStatus(true);
-                                            console.log(`Task ${task.taskId}: Re-opening from Resolved...`);
                                             try {
-                                                await issueService.updateTaskStatus(task.taskId, 'Open');
-                                                console.log('Task re-opened successfully, refreshing...');
-                                                await loadData(task.taskId);
-                                                alert('Task Re-opened successfully!');
+                                                const targetStatus = currentUser?.roleName === 'Admin' ? 'Closed' : 'Resolved';
+                                                await issueService.updateTaskStatus(task.taskId, targetStatus);
+                                                loadTask();
                                             } catch (e: any) {
-                                                const msg = e.response?.data?.message || 'Failed to re-open';
-                                                console.error('Re-open Error:', e.response?.data || e.message);
-                                                alert(`ERROR: ${msg}`);
-                                            }
-                                            finally { setUpdatingStatus(false); }
+                                                alert(e.response?.data?.message || 'Failed to update status');
+                                            } finally { setUpdatingStatus(false); }
                                         }}
                                         disabled={updatingStatus}
-                                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded text-sm font-medium transition-colors"
+                                        className="btn-primary"
                                     >
-                                        {updatingStatus ? 'Opening...' : 'Re-open Task'}
+                                        {updatingStatus ? 'Updating...' : (currentUser?.roleName === 'Admin' ? 'Close Task' : 'Submit for Review')}
                                     </button>
-                                </div>
-                            ) : (
-                                <button
-                                    onClick={async () => {
-                                        if (!confirm('Re-open this task? This will also re-open the Issue.')) return;
-                                        setUpdatingStatus(true);
-                                        try {
-                                            await issueService.updateTaskStatus(task.taskId, 'Open');
-                                            setTask({ ...task, statusName: 'Open' });
-                                        } catch (e: any) {
-                                            const msg = e.response?.data?.message || 'Failed to update status';
-                                            alert(msg);
-                                        }
-                                        finally { setUpdatingStatus(false); }
-                                    }}
-                                    disabled={updatingStatus}
-                                    className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded text-sm font-medium"
-                                >
-                                    Re-open Task
-                                </button>
-                            )}
-                        </div>
-                    )}
-                </div>
-                <div className="prose max-w-none text-gray-700 border-t pt-4">
-                    <p>{task.taskDescription}</p>
-                </div>
-            </div>
+                                ) : task.statusName === 'Resolved' ? (
+                                    <>
+                                        {currentUser?.roleName === 'Admin' && (
+                                            <button
+                                                onClick={async () => {
+                                                    if (!window.confirm('Approve and Close this task?')) return;
+                                                    setUpdatingStatus(true);
+                                                    try {
+                                                        await issueService.updateTaskStatus(task.taskId, 'Closed');
+                                                        loadTask();
+                                                    } catch (e: any) {
+                                                        alert(e.response?.data?.message || 'Failed to close');
+                                                    } finally { setUpdatingStatus(false); }
+                                                }}
+                                                disabled={updatingStatus}
+                                                className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700"
+                                            >
+                                                {updatingStatus ? 'Closing...' : 'Approve & Close'}
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={async () => {
+                                                if (!window.confirm('Re-open this task?')) return;
+                                                setUpdatingStatus(true);
+                                                try {
+                                                    await issueService.updateTaskStatus(task.taskId, 'Open');
+                                                    loadTask();
+                                                } catch (e: any) {
+                                                    alert(e.response?.data?.message || 'Failed to re-open');
+                                                } finally { setUpdatingStatus(false); }
+                                            }}
+                                            disabled={updatingStatus}
+                                            className="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-200"
+                                        >
+                                            {updatingStatus ? 'Opening...' : 'Re-open Task'}
+                                        </button>
+                                    </>
+                                ) : (
+                                    <button
+                                        onClick={async () => {
+                                            if (!window.confirm('Re-open this task?')) return;
+                                            setUpdatingStatus(true);
+                                            try {
+                                                await issueService.updateTaskStatus(task.taskId, 'Open');
+                                                loadTask();
+                                            } catch (e: any) {
+                                                alert(e.response?.data?.message || 'Failed to re-open');
+                                            } finally { setUpdatingStatus(false); }
+                                        }}
+                                        disabled={updatingStatus}
+                                        className="bg-slate-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-700"
+                                    >
+                                        Re-open Task
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
 
-            <div className="bg-white shadow rounded-lg p-6">
-                <CommentThread taskId={task.taskId} comments={comments} onCommentAdded={refreshComments} />
+                    {/* Comments Section */}
+                    <div>
+                        <CommentsSection taskId={task.taskId} />
+                    </div>
+                </div>
+
+                {/* Sidebar */}
+                <div className="space-y-6">
+                    <div className="premium-card p-6">
+                        <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-widest mb-4 border-b border-slate-100 pb-2">Details</h3>
+                        <dl className="space-y-4">
+                            <div>
+                                <dt className="text-xs font-bold text-slate-400 uppercase">Assigned To</dt>
+                                <dd className="mt-1">
+                                    {currentUser?.roleName === 'Admin' ? (
+                                        <select
+                                            className="input-field py-1 text-sm"
+                                            value={users.find(u => u.name === task.assignedToName)?.userId || ''}
+                                            onChange={async (e) => {
+                                                if (!e.target.value) return;
+                                                setAssigning(true);
+                                                try {
+                                                    await issueService.assignTask(task.taskId, parseInt(e.target.value));
+                                                    loadTask();
+                                                } catch (err) {
+                                                    alert('Failed to assign task');
+                                                } finally {
+                                                    setAssigning(false);
+                                                }
+                                            }}
+                                            disabled={assigning}
+                                        >
+                                            <option value="">Unassigned</option>
+                                            {users.map(u => (
+                                                <option key={u.userId} value={u.userId}>{u.name}</option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-6 h-6 rounded bg-indigo-100 flex items-center justify-center text-[10px] font-bold text-indigo-700">
+                                                {task.assignedToName ? task.assignedToName.charAt(0) : 'U'}
+                                            </div>
+                                            <span className="font-bold text-slate-700 text-sm">{task.assignedToName || 'Unassigned'}</span>
+                                        </div>
+                                    )}
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+
+                    <div className="premium-card p-0 overflow-hidden">
+                        <button
+                            onClick={() => setShowActivity(!showActivity)}
+                            className="w-full flex justify-between items-center p-4 bg-slate-50 hover:bg-slate-100 transition-colors border-b border-slate-100"
+                        >
+                            <span className="text-sm font-extrabold text-slate-900 uppercase tracking-widest">Activity Log</span>
+                            <svg className={`w-5 h-5 text-slate-400 transform transition-transform ${showActivity ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        {showActivity && (
+                            <div className="p-4 max-h-[300px] overflow-y-auto custom-scrollbar">
+                                <ActivityTimeline logs={logs} />
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
-        </div >
+        </div>
     );
 };

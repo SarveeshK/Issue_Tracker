@@ -88,6 +88,14 @@ public class IssueService : IIssueService
             filteredIssues = filteredIssues.Where(i => i.IssueType.Equals(type, StringComparison.OrdinalIgnoreCase));
         }
         
+        // Sorting: Closed at bottom, then Priority (High to Low)
+        var closedStatus = statues.FirstOrDefault(s => s.StatusName == "Closed");
+        int closedId = closedStatus?.StatusId ?? 3; // Default to 3 if not found
+        
+        filteredIssues = filteredIssues
+            .OrderBy(i => i.StatusId == closedId) // False (0) -> Open/etc first, True (1) -> Closed last
+            .ThenBy(i => i.PriorityId); // 1 (High) -> 2 (Medium) -> 3 (Low)
+        
         // var allTasks = await _taskRepository.GetAllAsync(); // Already fetched above
         var allEmployees = await _userRepository.GetAllAsync(); // Actually we need Employee names, but we used User names mostly. 
         // Let's use User names consistently if possible, or fetch Employees if needed.

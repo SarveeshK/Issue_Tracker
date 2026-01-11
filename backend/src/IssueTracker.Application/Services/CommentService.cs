@@ -18,24 +18,26 @@ public class CommentService : ICommentService
 
     public async System.Threading.Tasks.Task<IEnumerable<CommentDto>> GetCommentsByTaskIdAsync(int taskId)
     {
-        // Fetch all comments for the task
-        var comments = await _commentRepo.FindAsync(c => c.TaskId == taskId);
-        
-        // Fetch users to map names (Manual join again since no Includes in generic repo yet)
-        var userIds = comments.Select(c => c.UserId).Distinct();
-        // This is inefficient (N+1-ish if we loop find), but better:
-        // Generic Repo FindAsync usage limits us. 
-        // In real app, we use Join or Includes.
-        // For scaffold, I'll just map IDs to names if I can, or return "User X".
-        // Actually, let's try to fetch all users.
+        var comments = await _commentRepo.FindAsync(c => c.TaskId == taskId); // Assuming soft delete might come later, but for now just TaskId
+        return await BuildDtoAndTree(comments);
+    }
+
+    public async System.Threading.Tasks.Task<IEnumerable<CommentDto>> GetCommentsByIssueIdAsync(int issueId)
+    {
+        var comments = await _commentRepo.FindAsync(c => c.IssueId == issueId);
+        return await BuildDtoAndTree(comments);
+    }
+
+    private async System.Threading.Tasks.Task<IEnumerable<CommentDto>> BuildDtoAndTree(IEnumerable<Comment> comments)
+    {
         var allUsers = await _userRepo.GetAllAsync();
         var userDictionary = allUsers.ToDictionary(u => u.UserId, u => u.Name);
 
-        // Map to DTOs
         var dtos = comments.Select(c => new CommentDto
         {
             CommentId = c.CommentId,
             TaskId = c.TaskId,
+            IssueId = c.IssueId,
             UserId = c.UserId,
             UserName = userDictionary.ContainsKey(c.UserId) ? userDictionary[c.UserId] : "Unknown",
             CommentText = c.CommentText,
@@ -43,7 +45,6 @@ public class CommentService : ICommentService
             CreatedDate = c.CreatedDate
         }).ToList();
 
-        // Build Hierarchy (Threading)
         return BuildCommentTree(dtos);
     }
 
@@ -69,9 +70,15 @@ public class CommentService : ICommentService
 
     public async System.Threading.Tasks.Task<CommentDto> CreateCommentAsync(CreateCommentDto dto)
     {
+        if (!dto.TaskId.HasValue && !dto.IssueId.HasValue)
+        {
+             throw new Exception("Comment must be linked to either a Task or an Issue.");
+        }
+
         var comment = new Comment
         {
             TaskId = dto.TaskId,
+            IssueId = dto.IssueId,
             UserId = dto.UserId,
             CommentText = dto.CommentText,
             ParentCommentId = dto.ParentCommentId,
@@ -80,13 +87,13 @@ public class CommentService : ICommentService
 
         await _commentRepo.AddAsync(comment);
 
-        // Fetch user name
         var user = await _userRepo.GetByIdAsync(dto.UserId);
 
         return new CommentDto
         {
             CommentId = comment.CommentId,
             TaskId = comment.TaskId,
+            IssueId = comment.IssueId,
             UserId = comment.UserId,
             UserName = user?.Name ?? "Unknown",
             CommentText = comment.CommentText,

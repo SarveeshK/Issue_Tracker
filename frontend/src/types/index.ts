@@ -38,7 +38,8 @@ export interface CreateTaskDto {
 
 export interface CommentDto {
     commentId: number;
-    taskId: number;
+    taskId?: number;
+    issueId?: number;
     userId: number;
     userName: string;
     commentText: string;
@@ -48,8 +49,9 @@ export interface CommentDto {
 }
 
 export interface CreateCommentDto {
-    taskId: number;
+    taskId?: number;
+    issueId?: number;
     userId: number;
     commentText: string;
-    parentCommentId: number | null;
+    parentCommentId?: number | null;
 }

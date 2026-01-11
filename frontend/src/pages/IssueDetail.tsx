@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { issueService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { ActivityTimeline } from '../components/ActivityTimeline';
+import { CommentsSection } from '../components/CommentsSection';
 import type { IssueDto, TaskDto } from '../types';
 
 export const IssueDetail: React.FC = () => {
@@ -261,6 +262,11 @@ export const IssueDetail: React.FC = () => {
                                 </div>
                             </form>
                         )}
+                    </div>
+
+                    {/* Comments Section */}
+                    <div>
+                        <CommentsSection issueId={issue.issueId} />
                     </div>
                 </div>
 
