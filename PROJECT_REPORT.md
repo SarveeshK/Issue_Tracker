@@ -73,8 +73,11 @@ Developing WorkHub-CES involved overcoming significant complexities. Here is how
 
 ---
 
-### 5. Future Roadmap
-
+### 📅 Future Roadmap
+- [x] **Phase 1**: Core CRUD & Authentication (Completed)
+- [x] **Phase 2**: Advanced RBAC & Security (Completed)
+- [x] **Phase 3**: UI Polish & Anonymization (Completed)
+- [x] **Phase 4**: Cloud Deployment & Containerization (Completed - Live on Render)
 -   **🔔 Notification Engine**: Email and real-time socket alerts for task assignments.
 -   **📎 File Attachments**: Azure Blob Storage integration for screenshot uploads.
 -   **🧩 Kanban Board**: Interactive drag‑and‑drop board for visual task management.

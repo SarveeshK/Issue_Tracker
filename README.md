@@ -1,9 +1,16 @@
 # 🚀 WorkHub - CES System
 ### Customer and Employee Service System
 
-![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
-![AI Assisted](https://img.shields.io/badge/Built%20With-AI%20Assistance-blueviolet?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Live_Production-success)
+![License](https://img.shields.io/badge/License-MIT-blue)
+![Deployment](https://img.shields.io/badge/Deployed_on-Render-purple)
+
+## 🚀 Live Demo
+**Access the Production System here:** [https://issue-tracker-13zc.onrender.com](https://issue-tracker-13zc.onrender.com)
+*(Login credentials provided in the Project Report)*
+
+## 📖 Project Overview
+![AI Assisted](https://img.shields.io/badge/Built%20With-AI%20Assistance-blueviolet)
 
 **WorkHub-CES** is a comprehensive, enterprise-grade solution designed to streamline interactions between customers and employees. Built with a modern tech stack and Clean Architecture principles, it offers robust role-based access control, real-time collaboration, and secure data management.
 
