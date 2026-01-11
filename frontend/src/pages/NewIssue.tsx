@@ -7,7 +7,8 @@ export const NewIssue: React.FC = () => {
     const [formData, setFormData] = useState({
         issueTitle: '',
         issueDescription: '',
-        issueType: 'Bug'
+        issueType: 'Bug',
+        priorityId: 2 // Default Medium
     });
     const [loading, setLoading] = useState(false);
 
@@ -46,17 +47,31 @@ export const NewIssue: React.FC = () => {
                         onChange={e => setFormData({ ...formData, issueDescription: e.target.value })}
                     />
                 </div>
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-bold mb-2">Type</label>
-                    <select
-                        className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        value={formData.issueType}
-                        onChange={e => setFormData({ ...formData, issueType: e.target.value })}
-                    >
-                        <option value="Bug">Bug</option>
-                        <option value="Feature">Feature</option>
-                        <option value="Enhancement">Enhancement</option>
-                    </select>
+                <div className="mb-6 flex gap-4">
+                    <div className="w-1/2">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Type</label>
+                        <select
+                            className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            value={formData.issueType}
+                            onChange={e => setFormData({ ...formData, issueType: e.target.value })}
+                        >
+                            <option value="Bug">Bug</option>
+                            <option value="Feature">Feature</option>
+                            <option value="Enhancement">Enhancement</option>
+                        </select>
+                    </div>
+                    <div className="w-1/2">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Priority</label>
+                        <select
+                            className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            value={formData.priorityId}
+                            onChange={e => setFormData({ ...formData, priorityId: parseInt(e.target.value) })}
+                        >
+                            <option value={1}>High</option>
+                            <option value={2}>Medium</option>
+                            <option value={3}>Low</option>
+                        </select>
+                    </div>
                 </div>
                 <div className="flex items-center justify-between">
                     <button

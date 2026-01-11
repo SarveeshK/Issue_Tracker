@@ -7,6 +7,7 @@ public class TaskDto
     public string TaskDescription { get; set; } = string.Empty;
     public int IssueId { get; set; }
     public string StatusName { get; set; } = string.Empty;
+    public string PriorityName { get; set; } = string.Empty;
     public string? AssignedToName { get; set; }
     // Add StartDate etc if needed
 }
@@ -16,5 +17,15 @@ public class CreateTaskDto
     public int IssueId { get; set; }
     public string TaskTitle { get; set; } = string.Empty;
     public string TaskDescription { get; set; } = string.Empty;
+    public int PriorityId { get; set; } = 2; // Default Medium
     // We will default Status to Open and AssignedTo to null for now
+}
+public class UpdateTaskStatusDto
+{
+    public string StatusName { get; set; } = string.Empty;
+}
+
+public class AssignTaskDto
+{
+    public int UserId { get; set; }
 }

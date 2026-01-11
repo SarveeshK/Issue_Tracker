@@ -21,7 +21,15 @@ public class Issue
     [ForeignKey("StatusId")]
     public Status Status { get; set; } = null!;
 
+    public int PriorityId { get; set; }
+    [ForeignKey("PriorityId")]
+    public Priority Priority { get; set; } = null!;
+
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
+    public int? CreatedByUserId { get; set; }
+    [ForeignKey("CreatedByUserId")]
+    public User? CreatedBy { get; set; }
 
     public ICollection<Task> Tasks { get; set; } = new List<Task>();
 }

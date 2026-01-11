@@ -3,6 +3,7 @@ using System;
 using IssueTracker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IssueTracker.Infrastructure.Migrations
 {
     [DbContext(typeof(IssueTrackerContext))]
-    partial class IssueTrackerContextModelSnapshot : ModelSnapshot
+    [Migration("20260111000014_AddPrioritySystem")]
+    partial class AddPrioritySystem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -128,9 +131,6 @@ namespace IssueTracker.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
@@ -155,8 +155,6 @@ namespace IssueTracker.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("IssueId");
-
-                    b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("PriorityId");
 
@@ -286,13 +284,6 @@ namespace IssueTracker.Infrastructure.Migrations
                             Priority = 0,
                             Severity = 0,
                             StatusName = "Closed"
-                        },
-                        new
-                        {
-                            StatusId = 4,
-                            Priority = 0,
-                            Severity = 0,
-                            StatusName = "Resolved"
                         });
                 });
 
@@ -345,11 +336,6 @@ namespace IssueTracker.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("CompanyName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -377,72 +363,57 @@ namespace IssueTracker.Infrastructure.Migrations
                         new
                         {
                             UserId = 1,
-                            CompanyName = "Internal",
                             Email = "test@example.com",
                             EmployeeId = 1,
                             Name = "Test User",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$67CIDzGlgHJOpFfPU3aDP..TD5GZ0FqiBqmQlUMdVQ/Z9wQ7YE02G"
                         },
                         new
                         {
                             UserId = 2,
-                            CompanyName = "ClientCo",
                             Email = "client@example.com",
                             Name = "Client User",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$67CIDzGlgHJOpFfPU3aDP..TD5GZ0FqiBqmQlUMdVQ/Z9wQ7YE02G"
                         },
                         new
                         {
                             UserId = 3,
-                            CompanyName = "MACS",
                             Email = "sarveesh@macs.com",
                             EmployeeId = 2,
                             Name = "Sarveesh",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$67CIDzGlgHJOpFfPU3aDP..TD5GZ0FqiBqmQlUMdVQ/Z9wQ7YE02G"
                         },
                         new
                         {
                             UserId = 4,
-                            CompanyName = "MACS",
                             Email = "nigesh@macs.com",
                             EmployeeId = 3,
                             Name = "Nigesh",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$67CIDzGlgHJOpFfPU3aDP..TD5GZ0FqiBqmQlUMdVQ/Z9wQ7YE02G"
                         },
                         new
                         {
                             UserId = 5,
-                            CompanyName = "MACS",
                             Email = "keerthii@macs.com",
                             EmployeeId = 4,
                             Name = "Keerthii",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$67CIDzGlgHJOpFfPU3aDP..TD5GZ0FqiBqmQlUMdVQ/Z9wQ7YE02G"
                         },
                         new
                         {
                             UserId = 6,
-                            CompanyName = "MACS",
                             Email = "hanumanth@macs.com",
                             EmployeeId = 5,
                             Name = "Hanumanth",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$67CIDzGlgHJOpFfPU3aDP..TD5GZ0FqiBqmQlUMdVQ/Z9wQ7YE02G"
                         },
                         new
                         {
                             UserId = 7,
-                            CompanyName = "MACS",
                             Email = "gowtham@macs.com",
                             EmployeeId = 6,
                             Name = "Gowtham",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
-                        },
-                        new
-                        {
-                            UserId = 8,
-                            CompanyName = "Perfect Solutions",
-                            Email = "ramesh@perfect.com",
-                            Name = "Ramesh",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$67CIDzGlgHJOpFfPU3aDP..TD5GZ0FqiBqmQlUMdVQ/Z9wQ7YE02G"
                         });
                 });
 
@@ -485,10 +456,6 @@ namespace IssueTracker.Infrastructure.Migrations
 
             modelBuilder.Entity("IssueTracker.Domain.Entities.Issue", b =>
                 {
-                    b.HasOne("IssueTracker.Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId");
-
                     b.HasOne("IssueTracker.Domain.Entities.Priority", "Priority")
                         .WithMany()
                         .HasForeignKey("PriorityId")
@@ -500,8 +467,6 @@ namespace IssueTracker.Infrastructure.Migrations
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("CreatedBy");
 
                     b.Navigation("Priority");
 

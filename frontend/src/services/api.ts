@@ -3,13 +3,13 @@ import type { CreateIssueDto, IssueDto, CreateTaskDto, TaskDto, CommentDto, Crea
 
 const API_URL = 'http://localhost:5000/api';
 
-const api = axios.create({
+export const api = axios.create({
     baseURL: API_URL,
 });
 
 export const issueService = {
-    getAll: async () => {
-        const response = await api.get<IssueDto[]>('/issues');
+    getAll: async (filters?: { search?: string; status?: string; priority?: string; type?: string }) => {
+        const response = await api.get<IssueDto[]>('/issues', { params: filters });
         return response.data;
     },
     getById: async (id: number) => {
@@ -42,5 +42,15 @@ export const issueService = {
     createComment: async (data: CreateCommentDto) => {
         const response = await api.post<CommentDto>('/comments', data);
         return response.data;
+    },
+    getUsers: async () => {
+        const response = await api.get<{ userId: number; name: string; email: string }[]>('/users');
+        return response.data;
+    },
+    assignTask: async (taskId: number, userId: number) => {
+        await api.put(`/tasks/${taskId}/assign`, { userId });
+    },
+    updateTaskStatus: async (taskId: number, status: string) => {
+        await api.put(`/tasks/${taskId}/status`, { statusName: status });
     }
 };

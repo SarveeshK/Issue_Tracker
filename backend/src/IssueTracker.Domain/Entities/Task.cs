@@ -25,6 +25,10 @@ public class Task
     public int StatusId { get; set; }
     [ForeignKey("StatusId")]
     public Status Status { get; set; } = null!;
+
+    public int PriorityId { get; set; }
+    [ForeignKey("PriorityId")]
+    public Priority Priority { get; set; } = null!;
     
     public DateTime? StartDate { get; set; }
 

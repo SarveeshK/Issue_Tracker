@@ -4,14 +4,19 @@ export interface IssueDto {
     issueDescription: string;
     issueType: string;
     statusName: string;
+    priorityName: string;
     tasksCount: number;
     createdDate: string;
+    createdByUserName: string;
+    createdByCompanyName: string;
+    assignedToUsers: string[];
 }
 
 export interface CreateIssueDto {
     issueTitle: string;
     issueDescription: string;
     issueType: string;
+    priorityId: number;
 }
 
 export interface TaskDto {
@@ -20,6 +25,7 @@ export interface TaskDto {
     taskTitle: string;
     taskDescription: string;
     statusName: string;
+    priorityName: string;
     assignedToName: string | null;
 }
 
@@ -27,6 +33,7 @@ export interface CreateTaskDto {
     issueId: number;
     taskTitle: string;
     taskDescription: string;
+    priorityId: number;
 }
 
 export interface CommentDto {

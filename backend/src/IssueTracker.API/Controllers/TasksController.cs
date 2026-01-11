@@ -31,16 +31,48 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
     public async Task<ActionResult<TaskDto>> Create(CreateTaskDto dto)
     {
         try
         {
             var task = await _taskService.CreateTaskAsync(dto);
-            return CreatedAtAction(nameof(GetByIssueId), new { issueId = dto.IssueId }, task);
+            return CreatedAtAction(nameof(GetById), new { id = task.TaskId }, task);
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPut("{id}/assign")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")] // Strictly Admin
+    public async Task<IActionResult> Assign(int id, [FromBody] AssignTaskDto dto)
+    {
+        try
+        {
+            var result = await _taskService.AssignTaskAsync(id, dto.UserId);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPut("{id}/status")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin,Developer,Manager,QA")]
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateTaskStatusDto dto)
+    {
+        try
+        {
+            var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "User";
+            var result = await _taskService.UpdateTaskStatusAsync(id, dto.StatusName, userRole);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
         }
     }
 }

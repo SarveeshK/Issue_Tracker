@@ -3,6 +3,7 @@ using System;
 using IssueTracker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IssueTracker.Infrastructure.Migrations
 {
     [DbContext(typeof(IssueTrackerContext))]
-    partial class IssueTrackerContextModelSnapshot : ModelSnapshot
+    [Migration("20260111001826_AddClientInfo")]
+    partial class AddClientInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -286,13 +289,6 @@ namespace IssueTracker.Infrastructure.Migrations
                             Priority = 0,
                             Severity = 0,
                             StatusName = "Closed"
-                        },
-                        new
-                        {
-                            StatusId = 4,
-                            Priority = 0,
-                            Severity = 0,
-                            StatusName = "Resolved"
                         });
                 });
 
@@ -381,7 +377,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             Email = "test@example.com",
                             EmployeeId = 1,
                             Name = "Test User",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$CVJWrntWvcle3j8edkbb4OqBP.bnEvopHJ1g2lTXk6YdkBbu3OWvS"
                         },
                         new
                         {
@@ -389,7 +385,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             CompanyName = "ClientCo",
                             Email = "client@example.com",
                             Name = "Client User",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$CVJWrntWvcle3j8edkbb4OqBP.bnEvopHJ1g2lTXk6YdkBbu3OWvS"
                         },
                         new
                         {
@@ -398,7 +394,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             Email = "sarveesh@macs.com",
                             EmployeeId = 2,
                             Name = "Sarveesh",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$CVJWrntWvcle3j8edkbb4OqBP.bnEvopHJ1g2lTXk6YdkBbu3OWvS"
                         },
                         new
                         {
@@ -407,7 +403,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             Email = "nigesh@macs.com",
                             EmployeeId = 3,
                             Name = "Nigesh",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$CVJWrntWvcle3j8edkbb4OqBP.bnEvopHJ1g2lTXk6YdkBbu3OWvS"
                         },
                         new
                         {
@@ -416,7 +412,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             Email = "keerthii@macs.com",
                             EmployeeId = 4,
                             Name = "Keerthii",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$CVJWrntWvcle3j8edkbb4OqBP.bnEvopHJ1g2lTXk6YdkBbu3OWvS"
                         },
                         new
                         {
@@ -425,7 +421,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             Email = "hanumanth@macs.com",
                             EmployeeId = 5,
                             Name = "Hanumanth",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$CVJWrntWvcle3j8edkbb4OqBP.bnEvopHJ1g2lTXk6YdkBbu3OWvS"
                         },
                         new
                         {
@@ -434,7 +430,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             Email = "gowtham@macs.com",
                             EmployeeId = 6,
                             Name = "Gowtham",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$CVJWrntWvcle3j8edkbb4OqBP.bnEvopHJ1g2lTXk6YdkBbu3OWvS"
                         },
                         new
                         {
@@ -442,7 +438,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             CompanyName = "Perfect Solutions",
                             Email = "ramesh@perfect.com",
                             Name = "Ramesh",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = "$2a$11$CVJWrntWvcle3j8edkbb4OqBP.bnEvopHJ1g2lTXk6YdkBbu3OWvS"
                         });
                 });
 

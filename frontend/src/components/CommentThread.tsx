@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { issueService } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import type { CommentDto } from '../types';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(relativeTime);
+dayjs.extend(utc);
 
 interface CommentProps {
     comment: CommentDto;
@@ -9,33 +16,24 @@ interface CommentProps {
 }
 
 const timeAgo = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    let interval = seconds / 31536000;
-    if (interval > 1) return Math.floor(interval) + "y ago";
-    interval = seconds / 2592000;
-    if (interval > 1) return Math.floor(interval) + "mo ago";
-    interval = seconds / 86400;
-    if (interval > 1) return Math.floor(interval) + "d ago";
-    interval = seconds / 3600;
-    if (interval > 1) return Math.floor(interval) + "h ago";
-    interval = seconds / 60;
-    if (interval > 1) return Math.floor(interval) + "m ago";
-    return Math.floor(seconds) + "s ago";
+    // Treat dateStr as UTC by appending Z if missing (standard ASP.NET behavior mismatch fix)
+    // However, if backend sends ISO with Z, this is fine.
+    // Ideally dayjs.utc(dateStr).fromNow() works best if strings are standard ISO.
+    return dayjs.utc(dateStr).fromNow();
 };
 
 const CommentItem: React.FC<CommentProps> = ({ comment, taskId, onCommentAdded }) => {
     const [replying, setReplying] = useState(false);
     const [replyText, setReplyText] = useState('');
+    const { user } = useAuth();
 
     const handleReply = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!user) return; // Or handle not logged in
         try {
             await issueService.createComment({
                 taskId,
-                userId: 1,
+                userId: user.userId,
                 commentText: replyText,
                 parentCommentId: comment.commentId
             });
@@ -79,7 +77,9 @@ const CommentItem: React.FC<CommentProps> = ({ comment, taskId, onCommentAdded }
                 {/* Reply Input */}
                 {replying && (
                     <form onSubmit={handleReply} className="mt-3 flex gap-2 items-start animate-fade-in-down">
-                        <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0 mt-1 text-[10px] flex items-center justify-center text-gray-600">You</div>
+                        <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0 mt-1 text-[10px] flex items-center justify-center text-gray-600">
+                            {user ? user.name.charAt(0) : 'G'}
+                        </div>
                         <div className="flex-grow">
                             <input
                                 autoFocus
@@ -130,13 +130,15 @@ interface ThreadProps {
 
 export const CommentThread: React.FC<ThreadProps> = ({ taskId, comments, onCommentAdded }) => {
     const [newComment, setNewComment] = useState('');
+    const { user } = useAuth();
 
     const handlePostComment = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!user) return;
         try {
             await issueService.createComment({
                 taskId,
-                userId: 1,
+                userId: user.userId,
                 commentText: newComment,
                 parentCommentId: null
             });
@@ -154,7 +156,7 @@ export const CommentThread: React.FC<ThreadProps> = ({ taskId, comments, onComme
             {/* Top Level Input */}
             <div className="flex gap-3 mb-8">
                 <div className="w-10 h-10 rounded-full bg-gray-800 text-white flex items-center justify-center text-sm font-bold">
-                    Y
+                    {user ? user.name.charAt(0) : 'G'}
                 </div>
                 <form onSubmit={handlePostComment} className="flex-grow">
                     <input

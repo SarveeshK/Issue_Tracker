@@ -16,6 +16,12 @@ public class User
     [MaxLength(150)]
     public string Email { get; set; } = string.Empty;
 
+    [MaxLength(100)]
+    public string CompanyName { get; set; } = string.Empty;
+
+    [Required]
+    public string PasswordHash { get; set; } = string.Empty;
+
     public int? EmployeeId { get; set; }
     [ForeignKey("EmployeeId")]
     public Employee? Employee { get; set; }

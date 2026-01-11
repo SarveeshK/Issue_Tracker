@@ -3,6 +3,7 @@ using System;
 using IssueTracker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IssueTracker.Infrastructure.Migrations
 {
     [DbContext(typeof(IssueTrackerContext))]
-    partial class IssueTrackerContextModelSnapshot : ModelSnapshot
+    [Migration("20260110160911_AddPasswordHash")]
+    partial class AddPasswordHash
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,59 +79,12 @@ namespace IssueTracker.Infrastructure.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Employees");
-
-                    b.HasData(
-                        new
-                        {
-                            EmployeeId = 1,
-                            Email = "test@example.com",
-                            EmployeeName = "Test User",
-                            RoleId = 1
-                        },
-                        new
-                        {
-                            EmployeeId = 2,
-                            Email = "sarveesh@macs.com",
-                            EmployeeName = "Sarveesh",
-                            RoleId = 1
-                        },
-                        new
-                        {
-                            EmployeeId = 3,
-                            Email = "nigesh@macs.com",
-                            EmployeeName = "Nigesh",
-                            RoleId = 2
-                        },
-                        new
-                        {
-                            EmployeeId = 4,
-                            Email = "keerthii@macs.com",
-                            EmployeeName = "Keerthii",
-                            RoleId = 2
-                        },
-                        new
-                        {
-                            EmployeeId = 5,
-                            Email = "hanumanth@macs.com",
-                            EmployeeName = "Hanumanth",
-                            RoleId = 2
-                        },
-                        new
-                        {
-                            EmployeeId = 6,
-                            Email = "gowtham@macs.com",
-                            EmployeeName = "Gowtham",
-                            RoleId = 2
-                        });
                 });
 
             modelBuilder.Entity("IssueTracker.Domain.Entities.Issue", b =>
                 {
                     b.Property<int>("IssueId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CreatedByUserId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
@@ -148,62 +104,14 @@ namespace IssueTracker.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int>("PriorityId")
-                        .HasColumnType("int");
-
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
                     b.HasKey("IssueId");
 
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("PriorityId");
-
                     b.HasIndex("StatusId");
 
                     b.ToTable("Issues");
-                });
-
-            modelBuilder.Entity("IssueTracker.Domain.Entities.Priority", b =>
-                {
-                    b.Property<int>("PriorityId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("ColorCode")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<string>("PriorityName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.HasKey("PriorityId");
-
-                    b.ToTable("Priorities");
-
-                    b.HasData(
-                        new
-                        {
-                            PriorityId = 1,
-                            ColorCode = "red",
-                            PriorityName = "High"
-                        },
-                        new
-                        {
-                            PriorityId = 2,
-                            ColorCode = "orange",
-                            PriorityName = "Medium"
-                        },
-                        new
-                        {
-                            PriorityId = 3,
-                            ColorCode = "blue",
-                            PriorityName = "Low"
-                        });
                 });
 
             modelBuilder.Entity("IssueTracker.Domain.Entities.Role", b =>
@@ -286,13 +194,6 @@ namespace IssueTracker.Infrastructure.Migrations
                             Priority = 0,
                             Severity = 0,
                             StatusName = "Closed"
-                        },
-                        new
-                        {
-                            StatusId = 4,
-                            Priority = 0,
-                            Severity = 0,
-                            StatusName = "Resolved"
                         });
                 });
 
@@ -306,9 +207,6 @@ namespace IssueTracker.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("IssueId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PriorityId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("StartDate")
@@ -332,8 +230,6 @@ namespace IssueTracker.Infrastructure.Migrations
 
                     b.HasIndex("IssueId");
 
-                    b.HasIndex("PriorityId");
-
                     b.HasIndex("StatusId");
 
                     b.ToTable("Tasks");
@@ -344,11 +240,6 @@ namespace IssueTracker.Infrastructure.Migrations
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    b.Property<string>("CompanyName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -377,72 +268,9 @@ namespace IssueTracker.Infrastructure.Migrations
                         new
                         {
                             UserId = 1,
-                            CompanyName = "Internal",
                             Email = "test@example.com",
-                            EmployeeId = 1,
                             Name = "Test User",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
-                        },
-                        new
-                        {
-                            UserId = 2,
-                            CompanyName = "ClientCo",
-                            Email = "client@example.com",
-                            Name = "Client User",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
-                        },
-                        new
-                        {
-                            UserId = 3,
-                            CompanyName = "MACS",
-                            Email = "sarveesh@macs.com",
-                            EmployeeId = 2,
-                            Name = "Sarveesh",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
-                        },
-                        new
-                        {
-                            UserId = 4,
-                            CompanyName = "MACS",
-                            Email = "nigesh@macs.com",
-                            EmployeeId = 3,
-                            Name = "Nigesh",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
-                        },
-                        new
-                        {
-                            UserId = 5,
-                            CompanyName = "MACS",
-                            Email = "keerthii@macs.com",
-                            EmployeeId = 4,
-                            Name = "Keerthii",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
-                        },
-                        new
-                        {
-                            UserId = 6,
-                            CompanyName = "MACS",
-                            Email = "hanumanth@macs.com",
-                            EmployeeId = 5,
-                            Name = "Hanumanth",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
-                        },
-                        new
-                        {
-                            UserId = 7,
-                            CompanyName = "MACS",
-                            Email = "gowtham@macs.com",
-                            EmployeeId = 6,
-                            Name = "Gowtham",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
-                        },
-                        new
-                        {
-                            UserId = 8,
-                            CompanyName = "Perfect Solutions",
-                            Email = "ramesh@perfect.com",
-                            Name = "Ramesh",
-                            PasswordHash = "$2a$11$xDGG7Sc0UJviV62WQr78O.AFIX2rKgc1MpBCJ2a3VOP3QMu/VKtIK"
+                            PasswordHash = ""
                         });
                 });
 
@@ -485,25 +313,11 @@ namespace IssueTracker.Infrastructure.Migrations
 
             modelBuilder.Entity("IssueTracker.Domain.Entities.Issue", b =>
                 {
-                    b.HasOne("IssueTracker.Domain.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId");
-
-                    b.HasOne("IssueTracker.Domain.Entities.Priority", "Priority")
-                        .WithMany()
-                        .HasForeignKey("PriorityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("IssueTracker.Domain.Entities.Status", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Priority");
 
                     b.Navigation("Status");
                 });
@@ -520,12 +334,6 @@ namespace IssueTracker.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("IssueTracker.Domain.Entities.Priority", "Priority")
-                        .WithMany()
-                        .HasForeignKey("PriorityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("IssueTracker.Domain.Entities.Status", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId")
@@ -535,8 +343,6 @@ namespace IssueTracker.Infrastructure.Migrations
                     b.Navigation("AssignedEmployee");
 
                     b.Navigation("Issue");
-
-                    b.Navigation("Priority");
 
                     b.Navigation("Status");
                 });

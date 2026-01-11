@@ -3,6 +3,7 @@ using System;
 using IssueTracker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IssueTracker.Infrastructure.Migrations
 {
     [DbContext(typeof(IssueTrackerContext))]
-    partial class IssueTrackerContextModelSnapshot : ModelSnapshot
+    [Migration("20260111005141_AddResolvedStatus")]
+    partial class AddResolvedStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
