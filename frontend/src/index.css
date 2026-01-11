@@ -1,3 +1,73 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+    :root {
+        --primary: 221 83% 53%;
+        --primary-foreground: 210 40% 98%;
+        --background: 210 40% 98%;
+        --foreground: 222 47% 11%;
+        --card: 0 0% 100%;
+        --card-foreground: 222 47% 11%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222 47% 11%;
+        --border: 214 32% 91%;
+        --input: 214 32% 91%;
+        --ring: 221 83% 53%;
+        --radius: 0.75rem;
+    }
+
+    body {
+        @apply bg-slate-50 text-slate-900 antialiased;
+        font-family: 'Inter', sans-serif;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: 'Outfit', sans-serif;
+        @apply tracking-tight font-bold;
+    }
+}
+
+@layer components {
+    .premium-card {
+        @apply bg-white rounded-xl border border-slate-200 shadow-sm transition-all duration-300;
+    }
+
+    .premium-card:hover {
+        @apply shadow-md border-slate-300;
+    }
+
+    .glass-card {
+        @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl;
+    }
+
+    .btn-primary {
+        @apply bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold shadow-sm hover:bg-blue-700 active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none;
+    }
+
+    .input-field {
+        @apply w-full border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-slate-50/50;
+    }
+
+    .badge {
+        @apply px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-slate-100;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full hover:bg-slate-400 transition-colors;
+}

@@ -1,5 +1,6 @@
 using IssueTracker.Application.DTOs;
 using IssueTracker.Application.Interfaces;
+using IssueTracker.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IssueTracker.API.Controllers;
@@ -18,7 +19,15 @@ public class TasksController : ControllerBase
     [HttpGet("issue/{issueId}")]
     public async Task<ActionResult<IEnumerable<TaskDto>>> GetByIssueId(int issueId)
     {
-        var tasks = await _taskService.GetTasksByIssueIdAsync(issueId);
+        var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        int? userId = null;
+        if (int.TryParse(userIdString, out int id))
+        {
+            userId = id;
+        }
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+        var tasks = await _taskService.GetTasksByIssueIdAsync(issueId, userId, role);
         return Ok(tasks);
     }
 
@@ -74,5 +83,25 @@ public class TasksController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
+
+    [HttpDelete("{id}")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (userIdClaim == null) return Unauthorized();
+
+        var userId = int.Parse(userIdClaim.Value);
+        var result = await _taskService.DeleteTaskAsync(id, userId);
+        if (!result) return NotFound();
+        return NoContent();
+    }
+
+    [HttpGet("{id}/logs")]
+    public async Task<ActionResult<IEnumerable<AuditLog>>> GetLogs(int id)
+    {
+        var logs = await _taskService.GetTaskLogsAsync(id);
+        return Ok(logs);
     }
 }

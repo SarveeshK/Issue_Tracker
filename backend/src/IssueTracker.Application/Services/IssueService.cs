@@ -9,23 +9,22 @@ public class IssueService : IIssueService
 {
     private readonly IRepository<Issue> _issueRepository;
     private readonly IRepository<Status> _statusRepository;
-
-
-
     private readonly IRepository<IssueTracker.Domain.Entities.Task> _taskRepository;
     private readonly IRepository<Priority> _priorityRepository;
     private readonly IRepository<User> _userRepository;
+    private readonly IAuditService _auditService;
 
-    public IssueService(IRepository<Issue> issueRepository, IRepository<Status> statusRepository, IRepository<IssueTracker.Domain.Entities.Task> taskRepository, IRepository<Priority> priorityRepository, IRepository<User> userRepository)
+    public IssueService(IRepository<Issue> issueRepository, IRepository<Status> statusRepository, IRepository<IssueTracker.Domain.Entities.Task> taskRepository, IRepository<Priority> priorityRepository, IRepository<User> userRepository, IAuditService auditService)
     {
         _issueRepository = issueRepository;
         _statusRepository = statusRepository;
         _taskRepository = taskRepository;
         _priorityRepository = priorityRepository;
         _userRepository = userRepository;
+        _auditService = auditService;
     }
 
-    public async System.Threading.Tasks.Task<IEnumerable<IssueDto>> GetAllIssuesAsync(string? search = null, string? status = null, string? priority = null, string? type = null)
+    public async System.Threading.Tasks.Task<IEnumerable<IssueDto>> GetAllIssuesAsync(string? search = null, string? status = null, string? priority = null, string? type = null, int? userId = null, string? role = null)
     {
         // Ideally use AutoMapper here, manual mapping for learning clarity
         var issues = await _issueRepository.GetAllAsync();
@@ -33,9 +32,36 @@ public class IssueService : IIssueService
         var statues = await _statusRepository.GetAllAsync();
         var priorities = await _priorityRepository.GetAllAsync();
         var users = await _userRepository.GetAllAsync();
+        var allTasks = await _taskRepository.GetAllAsync();
 
         // Apply filters in memory (Simplified for scaffold, ideally done in DB)
         var filteredIssues = issues.AsEnumerable();
+
+        // Role-based filtering
+        if (userId.HasValue && !string.IsNullOrEmpty(role))
+        {
+            if (role == "User") // Client
+            {
+                filteredIssues = filteredIssues.Where(i => i.CreatedByUserId == userId);
+            }
+            else if (role == "Developer" || role == "QA") // Employee
+            {
+                // Employee can only see issues where they are assigned to a task
+                // We need to find the EmployeeId for this UserId
+                var currentUser = users.FirstOrDefault(u => u.UserId == userId);
+                if (currentUser != null && currentUser.EmployeeId.HasValue)
+                {
+                    var empId = currentUser.EmployeeId.Value;
+                    filteredIssues = filteredIssues.Where(i => allTasks.Any(t => t.IssueId == i.IssueId && t.AssignedTo == empId));
+                }
+                else
+                {
+                    // Should not happen for valid employees, but safe fallback: show nothing or everything? 
+                    // Let's safe fallback to hiding everything if we can't identify employee
+                     filteredIssues = Enumerable.Empty<Issue>();
+                }
+            }
+        }
 
         if (!string.IsNullOrEmpty(search))
         {
@@ -62,7 +88,7 @@ public class IssueService : IIssueService
             filteredIssues = filteredIssues.Where(i => i.IssueType.Equals(type, StringComparison.OrdinalIgnoreCase));
         }
         
-        var allTasks = await _taskRepository.GetAllAsync();
+        // var allTasks = await _taskRepository.GetAllAsync(); // Already fetched above
         var allEmployees = await _userRepository.GetAllAsync(); // Actually we need Employee names, but we used User names mostly. 
         // Let's use User names consistently if possible, or fetch Employees if needed.
         // Based on TaskService, AssignedTo is EmployeeId.
@@ -144,6 +170,8 @@ public class IssueService : IIssueService
 
         await _issueRepository.AddAsync(issue);
 
+        await _auditService.LogActivityAsync("Issue", issue.IssueId, "Created", $"Issue '{issue.IssueTitle}' was created.", userId);
+
         var priority = await _priorityRepository.GetByIdAsync(issue.PriorityId);
         var user = await _userRepository.GetByIdAsync(userId);
 
@@ -183,6 +211,28 @@ public class IssueService : IIssueService
 
         issue.StatusId = closedStatus.StatusId;
         await _issueRepository.UpdateAsync(issue);
+
+        // We don't have the current user ID here easily, let's pass a default or try to get it if possible. 
+        // For now, logging without userId or using a generic system id if needed.
+        await _auditService.LogActivityAsync("Issue", issue.IssueId, "Closed", "Issue was marked as Closed.", null);
+        
         return true;
+    }
+
+    public async System.Threading.Tasks.Task<bool> DeleteIssueAsync(int id, int userId)
+    {
+        var issue = await _issueRepository.GetByIdAsync(id);
+        if (issue == null) return false;
+
+        issue.IsDeleted = true;
+        await _issueRepository.UpdateAsync(issue);
+
+        await _auditService.LogActivityAsync("Issue", id, "Deleted", $"Issue '{issue.IssueTitle}' was soft-deleted.", userId);
+        return true;
+    }
+
+    public async System.Threading.Tasks.Task<IEnumerable<AuditLog>> GetIssueLogsAsync(int id)
+    {
+        return await _auditService.GetLogsForEntityAsync("Issue", id);
     }
 }

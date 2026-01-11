@@ -52,5 +52,19 @@ export const issueService = {
     },
     updateTaskStatus: async (taskId: number, status: string) => {
         await api.put(`/tasks/${taskId}/status`, { statusName: status });
+    },
+    deleteIssue: async (id: number) => {
+        await api.delete(`/issues/${id}`);
+    },
+    getIssueLogs: async (id: number) => {
+        const response = await api.get(`/issues/${id}/logs`);
+        return response.data;
+    },
+    deleteTask: async (id: number) => {
+        await api.delete(`/tasks/${id}`);
+    },
+    getTaskLogs: async (id: number) => {
+        const response = await api.get(`/tasks/${id}/logs`);
+        return response.data;
     }
 };

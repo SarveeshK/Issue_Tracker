@@ -17,6 +17,7 @@ public class IssueTrackerContext : DbContext
     public DbSet<IssueTracker.Domain.Entities.Task> Tasks { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Priority> Priorities { get; set; }
+    public DbSet<AuditLog> AuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -79,5 +80,9 @@ public class IssueTrackerContext : DbContext
             .WithMany(c => c.Replies)
             .HasForeignKey(c => c.ParentCommentId)
             .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete cycles
+
+        // Soft Delete Filters
+        modelBuilder.Entity<Issue>().HasQueryFilter(i => !i.IsDeleted);
+        modelBuilder.Entity<IssueTracker.Domain.Entities.Task>().HasQueryFilter(t => !t.IsDeleted);
     }
 }

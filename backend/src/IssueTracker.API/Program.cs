@@ -48,6 +48,7 @@ builder.Services.AddScoped<IIssueService, IssueService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuditService, AuditService>();
 
 // JWT Authentication
 var key = System.Text.Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"] ?? "IssueTrackerSecretKeyForDevelopmentOnly123!");

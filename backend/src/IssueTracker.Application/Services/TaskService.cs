@@ -16,8 +16,9 @@ public class TaskService : ITaskService
     private readonly IRepository<Employee> _employeeRepo;
     private readonly IRepository<Issue> _issueRepo;
     private readonly IRepository<Priority> _priorityRepo;
+    private readonly IAuditService _auditService;
 
-    public TaskService(IRepository<IssueTracker.Domain.Entities.Task> taskRepo, IRepository<Status> statusRepo, IRepository<User> userRepo, IRepository<Employee> employeeRepo, IRepository<Issue> issueRepo, IRepository<Priority> priorityRepo)
+    public TaskService(IRepository<IssueTracker.Domain.Entities.Task> taskRepo, IRepository<Status> statusRepo, IRepository<User> userRepo, IRepository<Employee> employeeRepo, IRepository<Issue> issueRepo, IRepository<Priority> priorityRepo, IAuditService auditService)
     {
         _taskRepo = taskRepo;
         _statusRepo = statusRepo;
@@ -25,11 +26,28 @@ public class TaskService : ITaskService
         _employeeRepo = employeeRepo;
         _issueRepo = issueRepo;
         _priorityRepo = priorityRepo;
+        _auditService = auditService;
     }
 
-    public async System.Threading.Tasks.Task<IEnumerable<TaskDto>> GetTasksByIssueIdAsync(int issueId)
+    public async System.Threading.Tasks.Task<IEnumerable<TaskDto>> GetTasksByIssueIdAsync(int issueId, int? userId = null, string? role = null)
     {
         var tasks = await _taskRepo.FindAsync(t => t.IssueId == issueId);
+        
+        // Filter for Employee: Only see assigned tasks
+        if (userId.HasValue && (role == "Developer" || role == "QA"))
+        {
+             var user = await _userRepo.GetByIdAsync(userId.Value);
+             if (user != null && user.EmployeeId.HasValue)
+             {
+                 tasks = tasks.Where(t => t.AssignedTo == user.EmployeeId.Value).ToList();
+             }
+             else
+             {
+                 // Fallback if employee ID not found
+                 tasks = new List<IssueTracker.Domain.Entities.Task>();
+             }
+        }
+
         var employees = await _employeeRepo.GetAllAsync();
         var statuses = await _statusRepo.GetAllAsync();
         var priorities = await _priorityRepo.GetAllAsync();
@@ -103,6 +121,8 @@ public class TaskService : ITaskService
 
         await _taskRepo.AddAsync(task);
 
+        await _auditService.LogActivityAsync("Task", task.TaskId, "Created", $"Task '{task.TaskTitle}' was created for Issue #{task.IssueId}.", null); // User ID usually passed from controller, but CreateTaskDto doesn't have it yet.
+
         var priority = await _priorityRepo.GetByIdAsync(task.PriorityId);
 
         return new TaskDto
@@ -129,6 +149,8 @@ public class TaskService : ITaskService
 
         task.AssignedTo = user.EmployeeId;
         await _taskRepo.UpdateAsync(task);
+
+        await _auditService.LogActivityAsync("Task", taskId, "Assigned", $"Task '{task.TaskTitle}' was assigned to {user.Name}.", null);
         return true;
     }
 
@@ -150,6 +172,8 @@ public class TaskService : ITaskService
         task.StatusId = status.StatusId;
         await _taskRepo.UpdateAsync(task);
 
+        await _auditService.LogActivityAsync("Task", taskId, "StatusUpdated", $"Task status set to {statusName}.", null);
+
         // Automation: If Task is re-opened (Open), and Issue is Closed, Re-open the Issue.
         if (statusName.Equals("Open", StringComparison.OrdinalIgnoreCase))
         {
@@ -170,5 +194,22 @@ public class TaskService : ITaskService
         }
 
         return true;
+    }
+
+    public async System.Threading.Tasks.Task<bool> DeleteTaskAsync(int id, int userId)
+    {
+        var task = await _taskRepo.GetByIdAsync(id);
+        if (task == null) return false;
+
+        task.IsDeleted = true;
+        await _taskRepo.UpdateAsync(task);
+
+        await _auditService.LogActivityAsync("Task", id, "Deleted", $"Task '{task.TaskTitle}' was soft-deleted.", userId);
+        return true;
+    }
+
+    public async System.Threading.Tasks.Task<IEnumerable<AuditLog>> GetTaskLogsAsync(int id)
+    {
+        return await _auditService.GetLogsForEntityAsync("Task", id);
     }
 }

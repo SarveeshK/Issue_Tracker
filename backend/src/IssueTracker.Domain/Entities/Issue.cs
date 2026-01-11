@@ -31,5 +31,7 @@ public class Issue
     [ForeignKey("CreatedByUserId")]
     public User? CreatedBy { get; set; }
 
+    public bool IsDeleted { get; set; } = false;
+
     public ICollection<Task> Tasks { get; set; } = new List<Task>();
 }
