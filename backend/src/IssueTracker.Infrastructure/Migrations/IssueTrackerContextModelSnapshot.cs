@@ -4,6 +4,7 @@ using IssueTracker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -17,36 +18,40 @@ namespace IssueTracker.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.2")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("IssueTracker.Domain.Entities.AuditLog", b =>
                 {
                     b.Property<int>("LogId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LogId"));
 
                     b.Property<string>("Action")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Detail")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("EntityId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("EntityType")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("LogId");
 
@@ -59,26 +64,28 @@ namespace IssueTracker.Infrastructure.Migrations
                 {
                     b.Property<int>("CommentId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CommentId"));
 
                     b.Property<string>("CommentText")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("IssueId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("ParentCommentId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("TaskId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("CommentId");
 
@@ -97,20 +104,22 @@ namespace IssueTracker.Infrastructure.Migrations
                 {
                     b.Property<int>("EmployeeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("EmployeeId"));
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("varchar(150)");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("EmployeeName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("EmployeeId");
 
@@ -167,36 +176,38 @@ namespace IssueTracker.Infrastructure.Migrations
                 {
                     b.Property<int>("IssueId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IssueId"));
 
                     b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("IssueDescription")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("IssueTitle")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("IssueType")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<int>("PriorityId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("StatusId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("IssueId");
 
@@ -213,17 +224,19 @@ namespace IssueTracker.Infrastructure.Migrations
                 {
                     b.Property<int>("PriorityId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PriorityId"));
 
                     b.Property<string>("ColorCode")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("PriorityName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("PriorityId");
 
@@ -254,12 +267,14 @@ namespace IssueTracker.Infrastructure.Migrations
                 {
                     b.Property<int>("RoleId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RoleId"));
 
                     b.Property<string>("RoleName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("RoleId");
 
@@ -292,18 +307,20 @@ namespace IssueTracker.Infrastructure.Migrations
                 {
                     b.Property<int>("StatusId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StatusId"));
 
                     b.Property<int>("Priority")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Severity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("StatusName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("StatusId");
 
@@ -344,34 +361,36 @@ namespace IssueTracker.Infrastructure.Migrations
                 {
                     b.Property<int>("TaskId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TaskId"));
 
                     b.Property<int?>("AssignedTo")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("IssueId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("PriorityId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("StatusId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("TaskDescription")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("TaskTitle")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.HasKey("TaskId");
 
@@ -390,29 +409,31 @@ namespace IssueTracker.Infrastructure.Migrations
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("varchar(150)");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<int?>("EmployeeId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.HasKey("UserId");
 
@@ -428,7 +449,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             Email = "test@example.com",
                             EmployeeId = 1,
                             Name = "Test User",
-                            PasswordHash = "$2a$11$KvPy9NrOot89vFBFYKFrRept.YRyGH7gNb0if0G7Ku1fHtYN4FZrK"
+                            PasswordHash = "$2a$11$QioR5ALZnDv5oBqkc.1hQu3ff2Lna4FffaaaE/1QK5SLyMDGqHRi6"
                         },
                         new
                         {
@@ -436,7 +457,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             CompanyName = "ClientCo",
                             Email = "client@example.com",
                             Name = "Client User",
-                            PasswordHash = "$2a$11$KvPy9NrOot89vFBFYKFrRept.YRyGH7gNb0if0G7Ku1fHtYN4FZrK"
+                            PasswordHash = "$2a$11$QioR5ALZnDv5oBqkc.1hQu3ff2Lna4FffaaaE/1QK5SLyMDGqHRi6"
                         },
                         new
                         {
@@ -445,7 +466,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             Email = "sarveesh@macs.com",
                             EmployeeId = 2,
                             Name = "Sarveesh",
-                            PasswordHash = "$2a$11$KvPy9NrOot89vFBFYKFrRept.YRyGH7gNb0if0G7Ku1fHtYN4FZrK"
+                            PasswordHash = "$2a$11$QioR5ALZnDv5oBqkc.1hQu3ff2Lna4FffaaaE/1QK5SLyMDGqHRi6"
                         },
                         new
                         {
@@ -454,7 +475,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             Email = "nigesh@macs.com",
                             EmployeeId = 3,
                             Name = "Nigesh",
-                            PasswordHash = "$2a$11$KvPy9NrOot89vFBFYKFrRept.YRyGH7gNb0if0G7Ku1fHtYN4FZrK"
+                            PasswordHash = "$2a$11$QioR5ALZnDv5oBqkc.1hQu3ff2Lna4FffaaaE/1QK5SLyMDGqHRi6"
                         },
                         new
                         {
@@ -463,7 +484,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             Email = "keerthii@macs.com",
                             EmployeeId = 4,
                             Name = "Keerthii",
-                            PasswordHash = "$2a$11$KvPy9NrOot89vFBFYKFrRept.YRyGH7gNb0if0G7Ku1fHtYN4FZrK"
+                            PasswordHash = "$2a$11$QioR5ALZnDv5oBqkc.1hQu3ff2Lna4FffaaaE/1QK5SLyMDGqHRi6"
                         },
                         new
                         {
@@ -472,7 +493,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             Email = "hanumanth@macs.com",
                             EmployeeId = 5,
                             Name = "Hanumanth",
-                            PasswordHash = "$2a$11$KvPy9NrOot89vFBFYKFrRept.YRyGH7gNb0if0G7Ku1fHtYN4FZrK"
+                            PasswordHash = "$2a$11$QioR5ALZnDv5oBqkc.1hQu3ff2Lna4FffaaaE/1QK5SLyMDGqHRi6"
                         },
                         new
                         {
@@ -481,7 +502,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             Email = "gowtham@macs.com",
                             EmployeeId = 6,
                             Name = "Gowtham",
-                            PasswordHash = "$2a$11$KvPy9NrOot89vFBFYKFrRept.YRyGH7gNb0if0G7Ku1fHtYN4FZrK"
+                            PasswordHash = "$2a$11$QioR5ALZnDv5oBqkc.1hQu3ff2Lna4FffaaaE/1QK5SLyMDGqHRi6"
                         },
                         new
                         {
@@ -489,7 +510,7 @@ namespace IssueTracker.Infrastructure.Migrations
                             CompanyName = "Perfect Solutions",
                             Email = "ramesh@perfect.com",
                             Name = "Ramesh",
-                            PasswordHash = "$2a$11$KvPy9NrOot89vFBFYKFrRept.YRyGH7gNb0if0G7Ku1fHtYN4FZrK"
+                            PasswordHash = "$2a$11$QioR5ALZnDv5oBqkc.1hQu3ff2Lna4FffaaaE/1QK5SLyMDGqHRi6"
                         });
                 });
 

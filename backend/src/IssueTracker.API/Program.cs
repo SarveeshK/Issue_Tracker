@@ -40,7 +40,7 @@ builder.Services.AddSwaggerGen(c =>
 // Data Access
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<IssueTrackerContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseNpgsql(connectionString));
 
 // Dependency Injection
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -108,5 +108,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Serve React App
+app.UseDefaultFiles();
+app.UseStaticFiles();
+app.MapFallbackToFile("index.html");
 
 app.Run();

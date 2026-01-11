@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { CreateIssueDto, IssueDto, CreateTaskDto, TaskDto, CommentDto, CreateCommentDto } from '../types';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = '/api';
 
 export const api = axios.create({
     baseURL: API_URL,
