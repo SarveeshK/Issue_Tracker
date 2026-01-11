@@ -29,11 +29,11 @@
 
 - **🔐 Role-Based Access Control (RBAC)**
   - Strictly separated environments for **Clients** (Users) and **Employees** (Developers/Admins).
-  - Secure data filtering: Clients only see their own issues.
+  - Secure data filtering: Clients only see and manage issues explicitly associated with their account.
 
 - **💬 Real-Time Collaboration**
   - Threaded **Comments System** on Issues and Tasks.
-  - **Anonymous Support**: Employee names are masked as `techsupport@macs.com` for clients.
+  - **Anonymized Support**: To maintain professional boundaries, employee identities are anonymized for client users through role‑aware DTO mapping ("techsupport@macs.com").
 
 - **📜 Comprehensive Audit Logs**
   - Activity timeline tracking every creation, update, and deletion.
@@ -76,7 +76,7 @@
 ---
 
 ## 🤖 AI Assistance
-This project was architected and developed with the assistance of advanced AI, leveraging agentic workflows for:
+AI agents were used as architectural assistants and implementation accelerators, while all core design decisions, data modeling, and system integration were authored, validated, and owned by the developer. The agents assisted with:
 -   **Clean Architecture** design.
 -   **Full-stack implementation** (React + .NET).
 -   **Debugging and Refactoring** complex logic.
@@ -85,5 +85,5 @@ This project was architected and developed with the assistance of advanced AI, l
 ---
 
 <p align="center">
-  Built with ❤️ by SarveeshK
+  Document prepared by the WorkHub Engineering Team with AI‑assisted tooling
 </p>
