@@ -20,14 +20,16 @@ public class CommentsController : ControllerBase
     [HttpGet("task/{taskId}")]
     public async Task<ActionResult<IEnumerable<CommentDto>>> GetByTaskId(int taskId)
     {
-        var comments = await _commentService.GetCommentsByTaskIdAsync(taskId);
+        var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "User";
+        var comments = await _commentService.GetCommentsByTaskIdAsync(taskId, role);
         return Ok(comments);
     }
 
     [HttpGet("issue/{issueId}")]
     public async Task<ActionResult<IEnumerable<CommentDto>>> GetByIssueId(int issueId)
     {
-        var comments = await _commentService.GetCommentsByIssueIdAsync(issueId);
+        var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "User";
+        var comments = await _commentService.GetCommentsByIssueIdAsync(issueId, role);
         return Ok(comments);
     }
 

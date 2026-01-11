@@ -16,33 +16,50 @@ public class CommentService : ICommentService
         _userRepo = userRepo;
     }
 
-    public async System.Threading.Tasks.Task<IEnumerable<CommentDto>> GetCommentsByTaskIdAsync(int taskId)
+    public async System.Threading.Tasks.Task<IEnumerable<CommentDto>> GetCommentsByTaskIdAsync(int taskId, string requesterRole)
     {
-        var comments = await _commentRepo.FindAsync(c => c.TaskId == taskId); // Assuming soft delete might come later, but for now just TaskId
-        return await BuildDtoAndTree(comments);
+        var comments = await _commentRepo.FindAsync(c => c.TaskId == taskId);
+        return await BuildDtoAndTree(comments, requesterRole);
     }
 
-    public async System.Threading.Tasks.Task<IEnumerable<CommentDto>> GetCommentsByIssueIdAsync(int issueId)
+    public async System.Threading.Tasks.Task<IEnumerable<CommentDto>> GetCommentsByIssueIdAsync(int issueId, string requesterRole)
     {
         var comments = await _commentRepo.FindAsync(c => c.IssueId == issueId);
-        return await BuildDtoAndTree(comments);
+        return await BuildDtoAndTree(comments, requesterRole);
     }
 
-    private async System.Threading.Tasks.Task<IEnumerable<CommentDto>> BuildDtoAndTree(IEnumerable<Comment> comments)
+    private async System.Threading.Tasks.Task<IEnumerable<CommentDto>> BuildDtoAndTree(IEnumerable<Comment> comments, string requesterRole)
     {
         var allUsers = await _userRepo.GetAllAsync();
-        var userDictionary = allUsers.ToDictionary(u => u.UserId, u => u.Name);
+        var userDictionary = allUsers.ToDictionary(u => u.UserId, u => u);
 
-        var dtos = comments.Select(c => new CommentDto
-        {
-            CommentId = c.CommentId,
-            TaskId = c.TaskId,
-            IssueId = c.IssueId,
-            UserId = c.UserId,
-            UserName = userDictionary.ContainsKey(c.UserId) ? userDictionary[c.UserId] : "Unknown",
-            CommentText = c.CommentText,
-            ParentCommentId = c.ParentCommentId,
-            CreatedDate = c.CreatedDate
+        var dtos = comments.Select(c => {
+            string userName = "Unknown";
+            if (userDictionary.ContainsKey(c.UserId))
+            {
+                var user = userDictionary[c.UserId];
+                // If requester is a Client ('User') and comment author is an Employee (has EmployeeId), mask the name.
+                if (requesterRole == "User" && user.EmployeeId.HasValue)
+                {
+                    userName = "techsupport@macs.com";
+                }
+                else
+                {
+                    userName = user.Name;
+                }
+            }
+
+            return new CommentDto
+            {
+                CommentId = c.CommentId,
+                TaskId = c.TaskId,
+                IssueId = c.IssueId,
+                UserId = c.UserId,
+                UserName = userName,
+                CommentText = c.CommentText,
+                ParentCommentId = c.ParentCommentId,
+                CreatedDate = c.CreatedDate
+            };
         }).ToList();
 
         return BuildCommentTree(dtos);

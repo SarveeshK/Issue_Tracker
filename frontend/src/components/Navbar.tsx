@@ -10,10 +10,10 @@ export const Navbar: React.FC = () => {
             <div className="container mx-auto flex justify-between items-center">
                 <div className="flex items-center gap-8">
                     <Link to="/" className="text-xl font-bold tracking-tight text-blue-500">
-                        Issue<span className="text-white">Tracker</span>
+                        Work<span className="text-white">Hub</span><span className="text-gray-400 font-normal ml-1">-CES</span>
                     </Link>
                     <div className="hidden md:flex items-center gap-6">
-                        <Link to="/" className="text-sm font-medium hover:text-blue-400 transition-colors">Dashboard</Link>
+                        {user && <Link to="/" className="text-sm font-medium hover:text-blue-400 transition-colors">Dashboard</Link>}
                     </div>
                 </div>
                 <div className="flex items-center gap-6">
@@ -28,9 +28,11 @@ export const Navbar: React.FC = () => {
                             </div>
                         </div>
                     )}
-                    <Link to="/new" className="bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-700 text-sm font-bold shadow-md transition-all active:scale-95">
-                        New Issue
-                    </Link>
+                    {user && (
+                        <Link to="/new" className="bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-700 text-sm font-bold shadow-md transition-all active:scale-95">
+                            New Issue
+                        </Link>
+                    )}
                     {user && (
                         <button
                             onClick={logout}
