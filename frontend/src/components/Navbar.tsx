@@ -28,7 +28,7 @@ export const Navbar: React.FC = () => {
                             </div>
                         </div>
                     )}
-                    {user && (
+                    {user && user.roleName !== 'Developer' && (
                         <Link to="/new" className="bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-700 text-sm font-bold shadow-md transition-all active:scale-95">
                             New Issue
                         </Link>
