@@ -1,116 +1,86 @@
-# 🚀 WorkHub - CES System (Customer and Employee Service System)
+# 🚀 WorkHub - CES System
+### Customer and Employee Service System
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Status](https://img.shields.io/badge/status-active-success.svg)
-![Backend](https://img.shields.io/badge/.NET-8.0-purple.svg)
-![Frontend](https://img.shields.io/badge/React-18-blue.svg)
+![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+![AI Assisted](https://img.shields.io/badge/Built%20With-AI%20Assistance-blueviolet?style=for-the-badge)
 
-A full-stack, enterprise-grade **Issue Tracking System** built with **Clean Architecture**. This application helps teams manage issues, assign tasks, track bugs, and collaborate in real-time with a secure, role-based environment.
-
----
-
-## ✨ Key Features
-
-- **🔐 Role-Based Access Control (RBAC)**: secure environment with distinct roles for Admins, Developers, QAs, and Clients.
-- **💬 Real-time Collaboration**: Nested comments system on issues and tasks.
-- **📜 Audit Trails**: Comprehensive audit logging for all critical actions (Create, Update, Delete).
-- **🎨 Glassmorphism UI**: A stunning, modern user interface built with Tailwind CSS.
-- **🗑️ Soft Deletes**: Data safety features ensuring no accidental permanent loss of records.
-- **📊 Dynamic Dashboard**: Interactive dashboard with priority sorting, status filtering, and visual metrics.
+**WorkHub-CES** is a comprehensive, enterprise-grade solution designed to streamline interactions between customers and employees. Built with a modern tech stack and Clean Architecture principles, it offers robust role-based access control, real-time collaboration, and secure data management.
 
 ---
 
 ## 🛠️ Technology Stack
 
-### **Backend**
-- **Framework**: ASP.NET Core Web API (.NET 8)
-- **Database**: SQLite (Dev) / SQL Server (Prod ready)
-- **ORM**: Entity Framework Core
-- **Architecture**: Clean Architecture (Domain, Application, Infrastructure, API layers)
-- **Auth**: JWT Authentication with Claims
-
 ### **Frontend**
-- **Library**: React 18
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **State**: Context API
-- **Build**: Vite
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
+
+### **Backend**
+![.NET Core](https://img.shields.io/badge/.NET%20Core-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
+![Entity Framework](https://img.shields.io/badge/Entity%20Framework-512BD4?style=for-the-badge&logo=.net&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
 
 ---
 
-## 🏗️ Architecture
+## ✨ Key Features
 
-The project follows the **Clean Architecture** principles to ensure separation of concerns and testability:
+- **🔐 Role-Based Access Control (RBAC)**
+  - Strictly separated environments for **Clients** (Users) and **Employees** (Developers/Admins).
+  - Secure data filtering: Clients only see their own issues.
 
-1.  **Domain Layer**: Core entities (`Issue`, `Task`, `Comment`) and enterprise logic.
-2.  **Application Layer**: Business rules, DTOs, and Interfaces.
-3.  **Infrastructure Layer**: Database context, Migrations, and external services.
-4.  **API Layer**: RESTful Controllers and Middleware.
+- **💬 Real-Time Collaboration**
+  - Threaded **Comments System** on Issues and Tasks.
+  - **Anonymous Support**: Employee names are masked as `techsupport@macs.com` for clients.
+
+- **📜 Comprehensive Audit Logs**
+  - Activity timeline tracking every creation, update, and deletion.
+  - **Soft Deletes**: Data preservation structure.
+
+- **🎨 Modern UI/UX**
+  - **Glassmorphism** design using Tailwind CSS.
+  - Interactive **Dashboard** with priority sorting (High/Medium/Low) and status indicators.
 
 ---
 
 ## 🚀 Getting Started
 
-Follow these instructions to get the project running on your local machine.
-
 ### Prerequisites
-- [.NET 8 SDK](https://dotnet.microsoft.com/download)
-- [Node.js & npm](https://nodejs.org/)
+- Node.js & npm
+- .NET 8 SDK
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/SarveeshK/Issue_Tracker.git
-cd Issue_Tracker
-```
+### Installation
 
-### 2. Backend Setup
-Navigate to the API folder and restore dependencies:
-```bash
-cd backend/src/IssueTracker.API
-dotnet restore
-dotnet ef database update --project ..\IssueTracker.Infrastructure --startup-project .
-dotnet run
-```
-*The API will start at `http://localhost:5000`*
+1.  **Clone the Repo**
+    ```bash
+    git clone https://github.com/SarveeshK/Issue_Tracker.git
+    ```
 
-### 3. Frontend Setup
-Open a new terminal, navigate to the frontend folder:
-```bash
-cd frontend
-npm install
-npm run dev
-```
-*The UI will launch at `http://localhost:5173`*
+2.  **Backend Setup**
+    ```bash
+    cd backend/src/IssueTracker.API
+    dotnet run
+    ```
+    *Server starts on http://localhost:5000*
+
+3.  **Frontend Setup**
+    ```bash
+    cd frontend
+    npm install
+    npm run dev
+    ```
+    *Client starts on http://localhost:5173*
 
 ---
 
-## 🛡️ Default Logins
-
-To quickly test the specific roles, you can seed the database and use:
-
-| Role | Email | Password |
-|------|-------|----------|
-| **Admin** | admin@example.com | Admin123! |
-| **Developer** | dev@example.com | Dev123! |
-| **Client** | client@example.com | Client123! |
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please fork the repository and create a pull request for any features or bug fixes.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+## 🤖 AI Assistance
+This project was architected and developed with the assistance of advanced AI, leveraging agentic workflows for:
+-   **Clean Architecture** design.
+-   **Full-stack implementation** (React + .NET).
+-   **Debugging and Refactoring** complex logic.
+-   **Security auditing** (RBAC & Anonymization).
 
 ---
 
