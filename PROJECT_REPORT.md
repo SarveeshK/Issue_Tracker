@@ -1,92 +1,86 @@
-# WorkHub (CES System) Project Report
+# WorkHub - CES System
+## Customer and Employee Service System: Project Report
 
-## 1. Project Overview
-The **Issue Tracker** is a full-stack web application designed to help teams track issues, bugs, and tasks efficiently. It features a robust role-based access control (RBAC) system, allowing different user types (Admins, Developers, QAs, Managers, and Clients) to interact with the system according to their permissions.
+---
 
-## 2. Technology Stack
+### 1. Executive Summary
+**WorkHub-CES** is a modern, enterprise-grade web application designed to bridge the gap between customers (Clients) and technical teams (Employees). It serves as a centralized platform for tracking issues, managing tasks, and facilitating seamless communication.
 
-### Frontend
-- **Framework**: React 18 (with Hooks and Functional Components)
-- **Language**: TypeScript (for strong typing and safety)
-- **Build Tool**: Vite (for fast development and bundling)
-- **Styling**: Tailwind CSS (Utility-first CSS framework for modern UI)
-- **Routing**: React Router DOM (v6)
-- **State Management**: Context API (AuthContext for user sessions)
-- **HTTP Client**: Axios (with centralized interceptors in `api.ts`)
-- **Icons**: Heroicons (via inline SVGs)
+Built with a **Clean Architecture** philosophy, the system ensures scalability, maintainability, and security. It leverages the power of **.NET 8** for a high-performance backend and **React 18** for a responsive, dynamic frontend.
 
-### Backend
-- **Framework**: ASP.NET Core Web API (.NET 8.0)
-- **ORM**: Entity Framework Core (Code-First approach)
-- **Database**: SQLite (for development portability)
-- **Authentication**: JWT (JSON Web Tokens) with Claims-based authorization.
-- **Architecture**: Clean Architecture / N-Layered Architecture.
+> **Note**: This entire project, from architectural design to granular code implementation, was developed with the assistance of advanced **Agentic AI**.
 
-## 3. Architecture Hierarchy
+---
 
-The project follows a **Clean Architecture** pattern to separate concerns and ensure maintainability.
+### 2. Core Functional Modules
 
-### Backend Structure
-1.  **IssueTracker.Domain**: The core of the application.
-    -   *Entities*: Database models (`Issue`, `Task`, `User`, `Comment`, `AuditLog`).
-    -   *Interfaces*: Repository contracts (`IRepository<T>`).
-    -   *Enums/Constants*: `Role`, `Status`, `Priority`.
-    -   *Dependencies*: None. Pure C#.
+#### A. Role-Based Access Control (RBAC)
+The system enforces strict security boundaries based on user roles:
+-   **Clients ("User")**: Restricted environment. Can only view and manage *their own* issues.
+-   **Employees**: Access to assigned tasks and collaborative features.
+-   **Admins**: Full system oversight.
 
-2.  **IssueTracker.Application**: Business logic layer.
-    -   *DTOs (Data Transfer Objects)*: Objects for API communication (`IssueDto`, `CreateCommentDto`), decoupled from entities.
-    -   *Services*: Business rules (`IssueService`, `TaskService`, `AuthService`).
-    -   *Interfaces*: Service contracts (`IIssueService`).
+#### B. Real-Time Collaboration
+-   **Threaded Comments**: Users can discuss issues in threaded conversations.
+-   **Anonymized Support**: To maintain professional boundaries, employee comments viewed by clients are automatically anonymized as "techsupport@macs.com".
 
-3.  **IssueTracker.Infrastructure**: External concerns.
-    -   *Data*: DbContext (`IssueTrackerContext`) and Migrations.
-    -   *Repositories*: Implementation of data access (`GenericRepository<T>`).
+#### C. Audit & Compliance
+-   **Activity Timeline**: A visual log of every critical action (Creation, Assignment, Status Change), providing total transparency.
+-   **Soft Deletes**: Data is never essentially lost; entities are "soft deleted" to preserve historical integrity.
 
-4.  **IssueTracker.API**: The entry point.
-    -   *Controllers*: RESTful endpoints (`IssuesController`, `AuthController`).
-    -   *Program.cs*: Dependency Injection (DI) setup and Middleware configuration.
+---
 
-### Frontend Structure
--   **src/pages**: Main views (`Dashboard`, `IssueDetail`, `TaskDetail`, `Login`).
--   **src/components**: Reusable UI blocks (`CommentsSection`, `ActivityTimeline`, `Layout`).
--   **src/services**: API communication logic (`api.ts`).
--   **src/context**: Global state providers (`AuthContext.tsx`).
--   **src/types**: TypeScript interfaces syncing with Backend DTOs.
+### 3. Technical Architecture
 
-## 4. Key Features Implemented
--   **Role-Based Security**: Clients (`User` role) are strictly sandboxed to their own issues. Employees (`Developer`, `QA`) generally focus on assigned tasks. Admins have full control.
--   **Audit Logging**: Every major action (Create, Update, Delete) is logged and displayed in an interactive timeline.
--   **Soft Deletes**: Entities are marked as `IsDeleted` instead of being removed, preserving history.
--   **Comments System**: Threaded discussions on both Issues and Tasks.
--   **Modern Dashboard**: Color-coded priorities, status badges, and intuitive sorting (Open > Closed).
+The solution follows the **Clean Architecture** (Onion Architecture) pattern, strictly separating concerns:
 
-## 5. Challenges & Solutions
+1.  **Domain Layer** (Inner Circle)
+    -   *Pure C# Entities*: `Issue`, `Task`, `Comment`, `AuditLog`.
+    -   *Enterprise Logic*: Validation rules and domain events.
+    -   *Dependencies*: None.
 
-Throughout the development lifecycle, we encountered several challenges. Here is how we overcame them:
+2.  **Application Layer**
+    -   *Orchestration*: Use Cases and Service interfaces (`IIssueService`).
+    -   *DTOs*: Decoupled data contracts for API communication.
+    -   *Role Logic*: Handling anonymization and permission checks.
 
-### A. Database Migrations & Context
--   **Challenge**: The Backend utilizes a multi-project solution. Running `dotnet ef` commands often failed because the tool couldn't locate the `DbContext` or the startup project.
--   **Solution**: We adopted strict command syntax using explicit flags:
-    `dotnet ef migrations add <Name> --project ..\IssueTracker.Infrastructure --startup-project .`
-    This ensured the tooling knew exactly where the Models lived and where the configuration was.
+3.  **Infrastructure Layer**
+    -   *Persistence*: Entity Framework Core with SQLite.
+    -   *Migrations*: Database schema management.
+    -   *Repositories*: Generic Repository implementation.
 
-### B. Missing Comments Table
--   **Challenge**: After implementing the Comments code, the feature failed silently (500 Internal Error) because the database table didn't exist.
--   **Solution**: We investigated the `Migrations` folder, realized the `AddComments` migration was never created, generated it, and applied it.
+4.  **Presentation Layer (API)**
+    -   *Endpoints*: RESTful controllers exposing resources.
+    -   *Security*: JWT Token generation and Claims middleware.
 
-### C. Role-Based Data Filtering
--   **Challenge**: Initially, the `GetAllIssues` endpoint returned everything. We needed Clients to only see *their* issues without creating separate "Client" endpoints.
--   **Solution**: We implemented **Server-Side Filtering** in `IssueService`. By passing the `currentUserId` and `role` to the service method, we dynamically filtered the generic repository query, ensuring security at the data access level over simple UI hiding.
+5.  **Frontend (Client)**
+    -   *Stack*: React 18, TypeScript, Tailwind CSS, Vite.
+    -   *State*: Context API (`AuthContext`) for global session management.
+    -   *UI Components*: Reusable, accessible components (`CommentsSection`, `ActivityTimeline`).
 
-### D. Frontend State & UI Breakages
--   **Challenge**: The `TaskDetail` page became unstable/broken due to partial updates and mixed logic during the rapid iteration of the API.
--   **Solution**: We performed a **Complete Component Rewrite**. Instead of patching lines, we rewrote `TaskDetail.tsx` from scratch to ensure clean state management, proper hook usage, and integration of the new `CommentsSection` component.
+---
 
-### E. File Locking
--   **Challenge**: `IssueTracker.API.exe` would often lock database files or DLLs, preventing builds or migrations.
--   **Solution**: We utilized the `taskkill /F /IM IssueTracker.API.exe` command to forcefully free resources before backend operations.
+### 4. Challenges & AI-Driven Solutions
 
-## 6. Future Roadmap
--   **Email Notifications**: Send alerts on task assignment.
--   **File Attachments**: Allow image uploads for bugs.
--   **Kanban Board**: Drag-and-drop status updates.
+Developing WorkHub-CES involved overcoming significant complexities. Here is how AI assistance accelerated the process:
+
+| Challenge | Technical Hurdle | AI Solution |
+| :--- | :--- | :--- |
+| **Data Privacy** | Clients needed to see strictly their own data without complex query logic in every controller. | AI suggested and implemented **Server-Side Filtering** within the Service layer, injecting `CurrentUserId` into repository queries automatically. |
+| **Privacy Anonymization** | Client users should not see individual employee names in comments to prevent harassment. | Designed a dynamic **DTO Mapping Strategy** that checks `RequesterRole` and masks `UserName` on the fly before data leaves the API. |
+| **Complex UI State** | The `TaskDetail` page required syncing comments, logs, and task data simultaneously. | AI architected a **Unified Component Structure** using custom hooks and distinct `useEffect` dependencies to manage asynchronous data fetching without race conditions. |
+| **Database Migrations** | Multi-project solution caused EF tool failures (`DbContext` not found). | AI provided precise CLI commands with `--project` and `--startup-project` flags to correctly target the Infrastructure layer. |
+
+---
+
+### 5. Future Roadmap
+
+-   **🔔 Notification Engine**: Email and real-time socket alerts for task assignments.
+-   **📎 File Attachments**: Azure Blob Storage integration for screenshot uploads.
+-   **drag_handle Kanban Board**: Interactive board for visual task management.
+
+---
+
+<p align="center">
+  <em>Document generated by WorkHub Engineering Team & AI Agents</em>
+</p>
